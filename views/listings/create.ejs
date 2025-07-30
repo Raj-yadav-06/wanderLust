@@ -1,0 +1,121 @@
+<% layout("layouts/biolerplate.ejs") %>
+
+<body class="listing-form-body">
+
+    <form method="post" action="/listings" class="listing-form" id="listingForm" novalidate enctype="multipart/form-data">
+        <h1>Create New Listing</h1>
+        <p class="form-subtitle">Share your space with the world</p>
+        
+        <div class="form-progress">
+            <div class="form-progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="title">Property Title</label>
+            <input type="text" placeholder="Enter a catchy title*" name="newListing[title]" id="title">
+            <small class="error" id="titleError"></small>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description</label>
+            <input type="text" placeholder="Describe your property" name="newListing[description]" id="description">
+            <small class="error" id="descriptionError"></small>
+        </div>
+        
+        <div class="form-group">
+            <label for="image">Property Image</label>
+            <input type="file" name="newListing[image]" id="image" >
+            <small class="error" id="imageError"></small>
+        </div>
+        
+        <div class="form-group">
+            <label for="price">Price per Night</label>
+            <input type="number" placeholder="Enter price in ₹" name="newListing[price]" id="price" min="0">
+            <small class="error" id="priceError"></small>
+        </div>
+        
+        <div class="form-group">
+            <label for="location">Location</label>
+            <input type="text" placeholder="City, Area" name="newListing[location]" id="location">
+            <small class="error" id="locationError"></small>
+        </div>
+        
+        <div class="form-group">
+            <label for="country">Country</label>
+            <input type="text" placeholder="Enter country" name="newListing[country]" id="country">
+            <small class="error" id="countryError"></small>
+        </div>
+
+        <div class="form-group">
+            <label for="categories">Property Categories (max 3)</label>
+            <div class="category-grid">
+                <div class="category-item">
+                    <input type="checkbox" name="newListing[category]" value="rooms" id="rooms">
+                    <label for="rooms" class="category-label">
+                        <span class="category-icon">🏠</span>
+                        <span class="category-text">Rooms</span>
+                    </label>
+                </div>
+                <div class="category-item">
+                    <input type="checkbox" name="newListing[category]" value="pools" id="pools">
+                    <label for="pools" class="category-label">
+                        <span class="category-icon">🏊</span>
+                        <span class="category-text">Pools</span>
+                    </label>
+                </div>
+                <div class="category-item">
+                    <input type="checkbox" name="newListing[category]" value="cabins" id="cabins">
+                    <label for="cabins" class="category-label">
+                        <span class="category-icon">🏕️</span>
+                        <span class="category-text">Cabins</span>
+                    </label>
+                </div>
+                <div class="category-item">
+                    <input type="checkbox" name="newListing[category]" value="mountains" id="mountains">
+                    <label for="mountains" class="category-label">
+                        <span class="category-icon">⛰️</span>
+                        <span class="category-text">Mountains</span>
+                    </label>
+                </div>
+                <div class="category-item">
+                    <input type="checkbox" name="newListing[category]" value="country side" id="countryside">
+                    <label for="countryside" class="category-label">
+                        <span class="category-icon">🌾</span>
+                        <span class="category-text">Countryside</span>
+                    </label>
+                </div>
+                <div class="category-item">
+                    <input type="checkbox" name="newListing[category]" value="boats" id="boats">
+                    <label for="boats" class="category-label">
+                        <span class="category-icon">⛵</span>
+                        <span class="category-text">Boats</span>
+                    </label>
+                </div>
+                <div class="category-item">
+                    <input type="checkbox" name="newListing[category]" value="amazing views" id="amazingviews">
+                    <label for="amazingviews" class="category-label">
+                        <span class="category-icon">🌅</span>
+                        <span class="category-text">Amazing Views</span>
+                    </label>
+                </div>
+                <div class="category-item">
+                    <input type="checkbox" name="newListing[category]" value="beach" id="beach">
+                    <label for="beach" class="category-label">
+                        <span class="category-icon">🏖️</span>
+                        <span class="category-text">Beach</span>
+                    </label>
+                </div>
+                <div class="category-item">
+                    <input type="checkbox" name="newListing[category]" value="farms" id="farms">
+                    <label for="farms" class="category-label">
+                        <span class="category-icon">🚜</span>
+                        <span class="category-text">Farms</span>
+                    </label>
+                </div>
+            </div>
+            <small class="error" id="categoriesError"></small>
+        </div>
+        
+        <button type="submit">Create Listing</button>
+    </form>
+</body>

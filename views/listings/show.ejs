@@ -1,0 +1,341 @@
+<% layout("layouts/biolerplate.ejs") %>
+
+<body>
+    <div class="show-container s-p-container">
+        
+        <div class="show-card s-card fade-in">
+            <div class="property-badge">Superhost</div>
+            <h3><%= list.title %></h3>
+            <img src="<%=list.image.url%>" alt="img" class="s-img">
+            <p><span><b><i class="fas fa-user"></i> Owned by</b> : </span><%= list.owner.username %></p>
+            <p><span><i class="fas fa-info-circle"></i> Description</span><br> : <%= list.description %></p>
+            <p><span class="price-highlight"><i class="fas fa-rupee-sign"></i> Price : </span>&#8377;<%= list.price.toLocaleString("en-IN")%>/night</p>
+            <p><span><i class="fas fa-map-marker-alt"></i> Location : </span><%= list.location %></p>
+            <p><span><i class="fas fa-globe"></i> Country : </span><%= list.country %></p>
+            <!-- <% if(currUser && currUser._id.equals(list.owner._id)) { %> -->
+            <div class="s-buttons">
+                <a href="/listings/<%=list.id%>/edit"><i class="fas fa-edit"></i> Edit</a>
+                <form method="post" action="/listings/<%=list.id%>?_method=DELETE">
+                    <button><i class="fas fa-trash"></i> Delete</button>
+                </form>
+            </div>
+            <!-- <% } %> -->
+        </div>
+    </div>
+    
+    <!-- review section -->
+    <% if(currUser) { %>
+    <div class="show-container">
+        <div class="review-section fade-in">
+            <h3><i class="fas fa-star"></i> Leave a Review</h3>
+            <form method="POST" action="/listings/<%=list._id%>/reviews" class="review-form" novalidate>
+                <div class="form-group">
+                    <label for="rating"><i class="fas fa-star-half-alt"></i> Rating:</label>
+                    <select name="review[rating]" id="rating" required>
+                        <option value="">--Select Rating--</option>
+                        <option value="5">⭐⭐⭐⭐⭐ 5 - Excellent</option>
+                        <option value="4">⭐⭐⭐⭐ 4 - Good</option>
+                        <option value="3">⭐⭐⭐ 3 - Average</option>
+                        <option value="2">⭐⭐ 2 - Poor</option>
+                        <option value="1">⭐ 1 - Terrible</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="comment"><i class="fas fa-comment"></i> Comment:</label>
+                    <textarea name="review[comment]" id="comment" rows="4" placeholder="Share your experience and help others make informed decisions..." required></textarea>
+                </div>
+
+                <button type="submit" class="review-btn"><i class="fas fa-paper-plane"></i> Submit Review</button>
+            </form>
+        </div>
+    </div>
+    <% } %>
+    
+    <div class="show-container">
+        <h2 id="review-head"><i class="fas fa-comments"></i> Guest Reviews</h2>
+
+        <div class="review-container">
+            <% if (list.reviews.length === 0) { %>
+                <div class="review-card">
+                    <p style="text-align: center; color: #717171; font-style: italic;">
+                        <i class="fas fa-inbox"></i> No reviews yet. Be the first to share your experience!
+                    </p>
+                </div>
+            <% } else { %>
+                <% list.reviews.forEach(review => { %>
+                    <div class="review-card fade-in">
+                        <div class="review-header">
+                            <span><i class="fas fa-user-circle"></i> <%= review.author.username %></span>
+                            <span class="review-rating">⭐ <%= review.rating %> / 5</span>
+                            <span class="review-date"><i class="fas fa-calendar"></i> <%= new Date(review.createdAt).toLocaleDateString() %></span>
+                        </div>
+                        <p class="review-comment">"<%= review.comment %>"</p>
+
+                        <form action="/listings/<%= list._id %>/reviews/<%= review._id %>?_method=DELETE" method="POST" class="delete-review-form">
+                            <button type="submit" class="delete-button"><i class="fas fa-trash-alt"></i> Delete</button>
+                        </form>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
+
+        <!-- MAP SECTION - Added below reviews -->
+        <div class="map-section fade-in">
+            <h3><i class="fas fa-map-marked-alt"></i> Where you'll be</h3>
+            <div class="location-info">
+                <p><span class="location-icon"><i class="fas fa-map-pin"></i></span><strong>Address:</strong> <%= list.location %>, <%= list.country %></p>
+                <% if (list.geometry && list.geometry.coordinates) { %>
+                    <p><span class="location-icon"><i class="fas fa-crosshairs"></i></span><strong>Coordinates:</strong> 
+                       <%= list.geometry.coordinates[1].toFixed(4) %>, <%= list.geometry.coordinates[0].toFixed(4) %>
+                    </p>
+                <% } %>
+            </div>
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <script>
+        // Debug: Check if Leaflet is loaded
+        console.log('Leaflet loaded:', typeof L !== 'undefined');
+        
+        // Initialize the map
+        let map;
+        let marker;
+        
+        // Location from your database
+        const propertyLocation = '<%= list.location %>';
+        const propertyCountry = '<%= list.country %>';
+        const fullAddress = propertyLocation + ', ' + propertyCountry;
+        
+        // Check if we have stored coordinates in database
+        <% if (list.geometry && list.geometry.coordinates) { %>
+            const storedCoordinates = {
+                lng: <%= list.geometry.coordinates[0] %>,
+                lat: <%= list.geometry.coordinates[1] %>
+            };
+            console.log('✅ Using stored coordinates:', storedCoordinates);
+        <% } else { %>
+            const storedCoordinates = null;
+            console.log('⚠️ No stored coordinates found, will geocode:', { propertyLocation, propertyCountry, fullAddress });
+        <% } %>
+        
+        // Initialize map with a default view
+        function initMap() {
+            try {
+                console.log('Initializing map...');
+                
+                // Check if map container exists
+                const mapContainer = document.getElementById('map');
+                if (!mapContainer) {
+                    console.error('Map container not found!');
+                    return;
+                }
+                
+                map = L.map('map', {
+                    zoomControl: true,
+                    scrollWheelZoom: true,
+                    doubleClickZoom: true,
+                    boxZoom: true,
+                    keyboard: true,
+                    dragging: true,
+                    touchZoom: true
+                }).setView([20.5937, 78.9629], 5); // Default to India center
+                
+                console.log('Map created successfully');
+                
+                // Add OpenStreetMap tiles (completely free)
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    maxZoom: 19,
+                    minZoom: 2
+                }).addTo(map);
+                
+                console.log('Tiles added successfully');
+                
+                // Force map to refresh and fix sizing issues
+                setTimeout(() => {
+                    map.invalidateSize();
+                    console.log('Map size invalidated');
+                    
+                    // Double-check that map is interactive
+                    console.log('Map options:', {
+                        dragging: map.dragging.enabled(),
+                        touchZoom: map.touchZoom.enabled(),
+                        scrollWheelZoom: map.scrollWheelZoom.enabled(),
+                        doubleClickZoom: map.doubleClickZoom.enabled()
+                    });
+                }, 100);
+                
+                // Use stored coordinates if available, otherwise geocode
+                if (storedCoordinates) {
+                    showLocationOnMap(storedCoordinates.lat, storedCoordinates.lng, 'stored');
+                } else {
+                    // Fallback to geocoding if no stored coordinates
+                    geocodeLocation(fullAddress);
+                }
+                
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                showMapError();
+            }
+        }
+        
+        // Function to show location on map (works with stored coordinates)
+        function showLocationOnMap(lat, lng, source) {
+            
+            // Center map on the location with better zoom
+            map.setView([lat, lng], 11); // Zoom level 15 for detailed view
+            
+            // Add marker
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            
+            marker = L.marker([lat, lng]).addTo(map);
+            
+            // Add popup with property info including country
+            const popupContent = `
+                <div style="text-align: center; font-family: Arial, sans-serif;">
+                    <h4 style="margin: 5px 0; color: #333;"><%= list.title %></h4>
+                    <p style="margin: 3px 0; color: #666;">📍 ${propertyLocation}, ${propertyCountry}</p>
+                    <p style="margin: 3px 0; color: #007bff; font-weight: bold;">₹<%= list.price.toLocaleString("en-IN") %>/night</p>
+                    <p style="margin: 2px 0; color: #999; font-size: 11px;">
+                        ${source === 'stored' ? '🎯 Exact location' : '📍 Geocoded location'}
+                    </p>
+                </div>
+            `;
+            
+            marker.bindPopup(popupContent).openPopup();
+        }
+        
+        // Geocode function using Nominatim (fallback for listings without stored coordinates)
+        function geocodeLocation(address) {
+            console.log('Geocoding address:', address);
+            
+            const encodedAddress = encodeURIComponent(address);
+            const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`;
+            
+            console.log('Geocoding URL:', geocodeUrl);
+            
+            fetch(geocodeUrl)
+                .then(response => {
+                    console.log('Geocoding response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Geocoding data:', data);
+                    
+                    if (data && data.length > 0) {
+                        const lat = parseFloat(data[0].lat);
+                        const lng = parseFloat(data[0].lon);
+                        
+                        console.log('Coordinates found:', { lat, lng });
+                        showLocationOnMap(lat, lng, 'geocoded');
+                        
+                    } else {
+                        console.log('Location not found, showing country view');
+                        geocodeCountry('<%= list.country %>');
+                    }
+                })
+                .catch(error => {
+                    console.error('Geocoding error:', error);
+                    geocodeCountry('<%= list.country %>');
+                });
+        }
+        
+        // Fallback function to show country if specific location fails
+        function geocodeCountry(countryName) {
+            console.log('Geocoding country:', countryName);
+            
+            const encodedCountry = encodeURIComponent(countryName);
+            const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodedCountry}&limit=1`;
+            
+            fetch(geocodeUrl)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Country geocoding data:', data);
+                    
+                    if (data && data.length > 0) {
+                        const lat = parseFloat(data[0].lat);
+                        const lng = parseFloat(data[0].lon);
+                        
+                        map.setView([lat, lng], 8); // Country-level zoom
+                        
+                        if (marker) {
+                            map.removeLayer(marker);
+                        }
+                        
+                        marker = L.marker([lat, lng]).addTo(map);
+                        marker.bindPopup(`
+                            <div style="text-align: center;">
+                                <h4><%= list.title %></h4>
+                                <p>📍 ${propertyLocation}, ${countryName}</p>
+                                <p style="color: #666; font-size: 12px;">Approximate location</p>
+                            </div>
+                        `).openPopup();
+                    }
+                })
+                .catch(error => {
+                    console.error('Country geocoding error:', error);
+                    showMapError();
+                });
+        }
+        
+        // Function to show map error
+        function showMapError() {
+            const mapContainer = document.getElementById('map');
+            if (mapContainer) {
+                mapContainer.innerHTML = `
+                    <div class="map-error">
+                        <i class="fas fa-map-marked-alt" style="font-size: 48px; color: #ddd; margin-bottom: 16px;"></i>
+                        <h4 style="color: #666; margin-bottom: 8px;">🗺️ Map could not be loaded</h4>
+                        <p style="color: #666; margin: 0;">Location: ${fullAddress}</p>
+                        <p style="color: #999; margin: 8px 0 0 0; font-size: 14px;">Please check your internet connection and try again</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing map...');
+            
+            // Add fade-in animation to elements
+            const fadeElements = document.querySelectorAll('.fade-in');
+            fadeElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(20px)';
+                    el.style.transition = 'all 0.6s ease';
+                    setTimeout(() => {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 200);
+            });
+            
+            // Add a small delay to ensure everything is loaded
+            setTimeout(() => {
+                initMap();
+                
+                // Additional fix for sizing issues
+                setTimeout(() => {
+                    if (map) {
+                        map.invalidateSize(true);
+                        console.log('Final map size invalidation');
+                    }
+                }, 1000);
+            }, 500);
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (map) {
+                map.invalidateSize();
+            }
+        });
+    </script>
+
+
+</body>

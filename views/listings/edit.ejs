@@ -1,0 +1,52 @@
+<% layout("layouts/biolerplate.ejs") %>
+
+<body>
+ <form method="POST" action="/listings/<%= list.id %>?_method=PUT" class="edit-form" id="listingForm" novalidate enctype="multipart/form-data">
+  <h1>Update Listing</h1>
+
+  <div class="form-group">
+    <label>Title:</label>
+    <input type="text" id="title" name="newListing[title]" value="<%= list.title %>">
+    <small class="error" id="titleError"></small>
+  </div>
+
+  <div class="form-group">
+    <label>Description:</label>
+    <textarea id="description" name="newListing[description]"><%= list.description %></textarea>
+    <small class="error" id="descriptionError"></small>
+  </div>
+  <div class="form-group">
+        <label>Original Image:</label>
+        <br>
+        <img src="<%=list.image.url%>" width = "200px" height="200px" style="border-radius: 20px;margin-top: -30px;">
+  </div>
+
+  <div class="form-group">
+    <label>Upload new Image:</label>
+    <input id="image" type = "file" name="newListing[image]">%>
+    <small class="error" id="imageError"></small>
+  </div>
+
+  <div class="form-group">
+    <label>Price:</label>
+    <input type="number" id="price" name="newListing[price]" value="<%= list.price %>">
+    <small class="error" id="priceError"></small>
+  </div>
+
+  <div class="form-group">
+    <label>Location:</label>
+    <input type="text" id="location" name="newListing[location]" value="<%= list.location %>">
+    <small class="error" id="locationError"></small>
+  </div>
+
+  <div class="form-group">
+    <label>Country:</label>
+    <input type="text" id="country" name="newListing[country]" value="<%= list.country %>">
+    <small class="error" id="countryError"></small>
+  </div>
+
+  <button type="submit">Update</button>
+</form>
+
+
+</body>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""/>
+
+<!-- Leaflet CSS -->
+<!-- Leaflet CSS -->
+
+
+<!-- Leaflet JS -->
+
+</head>
+<body>
+    <nav>
+    <%- include("../includes/navbar") %>
+    </nav>
+ 
+    <div class="container">
+              <%- include("../includes/flash")%>
+
+        <%- body %>
+    </div>
+    <footer>
+        <%- include("../includes/footer") %>
+    </footer>
+
+    <!-- Leaflet JavaScript - Load at the end -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+    <script>
+       setTimeout(() => {
+    const flash = document.querySelector('.flash-message');
+    if (flash){ flash.style.display = 'none';}
+  }, 4000);
+ function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        document.addEventListener('click', function(e) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburger = document.getElementById('hamburgerBtn');
+            
+            if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+  document.getElementById('listingForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  // Reset all errors
+  document.querySelectorAll('.error').forEach(el => el.textContent = '');
+  document.querySelectorAll('input').forEach(el => el.classList.remove('error-border'));
+
+  // Get inputs
+  const title = document.getElementById('title');
+  const description = document.getElementById('description');
+  const image = document.getElementById('image');
+  const price = document.getElementById('price');
+  const location = document.getElementById('location');
+  const country = document.getElementById('country');
+  
+
+  let isValid = true;
+
+  if (!title.value.trim()) {
+    document.getElementById('titleError').textContent = 'Title is required';
+    title.classList.add('error-border');
+    isValid = false;
+  }else{
+    title.classList.add('green-border');
+
+  }
+
+  if (!description.value.trim()) {
+    document.getElementById('descriptionError').textContent = 'Description is required';
+    description.classList.add('error-border');
+    isValid = false;
+  }else{
+    description.classList.add('green-border');
+
+  }
+
+  // const imageRegex = /^(https?:\/\/.*\.(jpg|jpeg|png|webp|svg))$/i;
+  // if (!image.value.trim()) {
+  //   document.getElementById('imageError').textContent = 'Default image will apply ✅';
+  //       document.getElementById("imageError").style.color = "green";
+
+  //   image.classList.remove("error-border");
+  //   image.classList.add('green-border');
+
+  // }else{
+  //   image.classList.add('green-border');
+
+  // }
+
+  if (!price.value || price.value <= 0) {
+    document.getElementById('priceError').textContent = 'Price must be greater than 0';
+    price.classList.add('error-border');
+    isValid = false;
+  }else{
+    price.classList.add('green-border');
+
+  }
+
+  if (!location.value.trim()) {
+    document.getElementById('locationError').textContent = 'Location is required';
+    location.classList.add('error-border');
+    isValid = false;
+  }else{
+    location.classList.add('green-border');
+
+  }
+
+  if (!country.value.trim()) {
+    document.getElementById('countryError').textContent = 'Country is required';
+    country.classList.add('error-border');
+    isValid = false;
+  }else{
+    country.classList.add('green-border');
+
+  }
+  
+
+  if (isValid) {
+    this.submit();
+  }
+});
+
+ let reviewForm = document.querySelector(".review-form");
+  reviewForm.addEventListener("submit", (e) => {
+      // Reset previous errors
+console.log("run");
+      const rating = document.getElementById("rating");
+      const comment = document.getElementById("comment");
+
+      rating.classList.remove("error-border");
+      comment.classList.remove("error-border");
+
+      let isValid = true;
+
+      // Rating validation
+      if (!rating.value) {
+        alert("Please select a rating.");
+        rating.classList.add("error-border");
+        isValid = false;
+      }
+
+      // Comment validation
+      if (!comment.value.trim()) {
+        alert("Please enter a comment.");
+        comment.classList.add("error-border");
+        isValid = false;
+      }
+
+      if (!isValid) {
+        e.preventDefault();
+      }
+    });
+
+// singup form validation
+ function validateForm() {
+  
+      let valid = true;
+      const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      // Clear previous errors
+      document.getElementById("usernameError").textContent = "";
+      document.getElementById("emailError").textContent = "";
+      document.getElementById("passwordError").textContent = "";
+
+      // Username validation
+      if (username.length < 3) {
+        document.getElementById("usernameError").textContent = "Username must be at least 3 characters.";
+        valid = false;
+      }
+
+      // Email validation
+      if (!email.match(/^[^@]+@[^@]+\.[^@]+$/)) {
+        document.getElementById("emailError").textContent = "Please enter a valid email.";
+        valid = false;
+      }
+
+      // Password validation
+      if (password.length < 6) {
+        document.getElementById("passwordError").textContent = "Password must be at least 6 characters.";
+        valid = false;
+      }
+
+      return valid;
+    }
+
+// login form validation
+ function validateLoginform() {
+  
+      let valid = true;
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      // Clear previous errors
+      document.getElementById("usernameError").textContent = "";
+      document.getElementById("passwordError").textContent = "";
+
+      // Username validation
+      if (username.length < 3) {
+        document.getElementById("usernameError").textContent = "Username must be at least 3 characters.";
+        valid = false;
+      }
+
+  
+      // Password validation
+      if (password.length < 6) {
+        document.getElementById("passwordError").textContent = "Password must be at least 6 characters.";
+        valid = false;
+      }
+
+      return valid;
+    }
+    </script>
+
+</body>
+</html>

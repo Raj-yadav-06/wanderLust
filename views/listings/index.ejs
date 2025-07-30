@@ -1,0 +1,94 @@
+<% layout("layouts/biolerplate.ejs") %>
+<body>
+   <div class="filters-section">
+        <div class="filters-container">
+            <div class="filters" id="filtersContainer">
+                 <div class="filter" data-filter="all">
+                    <div class="filter-icon"><i class="fas fa-list"></i></div>
+                    <p>All</p>
+                </div>
+                <div class="filter" data-filter="rooms">
+                    <div class="filter-icon"><i class="fa-solid fa-bed"></i></div>
+                    <p>Rooms</p>
+                </div>
+                <div class="filter" data-filter="pools">
+                    <div class="filter-icon"><i class="fa-solid fa-person-swimming"></i></div>
+                    <p>Amazing pools</p>
+                </div>
+                <div class="filter" data-filter="mountains">
+                    <div class="filter-icon"><i class="fa-solid fa-mountain"></i></div>
+                    <p>Mountains</p>
+                </div>
+                <div class="filter" data-filter="cabins">
+                    <div class="filter-icon"><i class="fa-solid fa-house-chimney-window"></i></div>
+                    <p>Cabins</p>
+                </div>
+                <div class="filter" data-filter="country side">
+                    <div class="filter-icon"><i class="fa-solid fa-building-circle-check"></i></div>
+                    <p>Country Side</p>
+                </div>
+                <div class="filter" data-filter="boat">
+                    <div class="filter-icon"><i class="fa-solid fa-ship"></i></div>
+                    <p>Boat</p>
+                </div>
+                <div class="filter" data-filter="amazing views">
+                    <div class="filter-icon"><i class="fa-solid fa-tree-city"></i></div>
+                    <p>Amazing views</p>
+                </div>
+                <div class="filter" data-filter="beach">
+                    <div class="filter-icon"><i class="fa-solid fa-umbrella-beach"></i></div>
+                    <p>Beach</p>
+                </div>
+                <div class="filter" data-filter="farms">
+                    <div class="filter-icon"><i class="fa-solid fa-tractor"></i></div>
+                    <p>Farms</p>
+                </div>
+            </div>
+
+            <!-- Filter Toggle -->
+            <div class="filter-toggle">
+                <input type="checkbox" id="filterToggle" onclick="toggleFilter()">
+                <span>Show without Gst</span>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+     <div id="container">
+    <%for(let list of listings){%>
+        
+            <div class="card">
+    
+                <h3><a href="/listings/<%=list.id%>"><%= list.title %></a></h3>
+                <img src="<%=list.image.url%>" alt="img">
+                <p> &#8377;<%= list.price.toLocaleString("en-IN")%>/night<span class="Gst"><i>+18 gst/-</i></span></p>
+        
+            </div>
+       
+        
+    <%}%>
+</div>
+
+
+
+<script>
+    let dataFilters = document.getElementsByClassName("filter");
+for(let filter of dataFilters){
+  filter.addEventListener("click", () =>{
+       let filterCollection = filter.getAttribute("data-filter");
+     return window.location.href = `/listings/filter/${filterCollection}`;
+  })
+}
+
+function toggleFilter(){
+let Taxes = Array.from(document.getElementsByClassName("Gst"));
+Taxes.forEach(tax => {
+    tax.classList.toggle("gstHide");
+});
+}
+</script>
+</body>

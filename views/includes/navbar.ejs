@@ -1,0 +1,87 @@
+<nav>
+  <div class="nav-container">
+            <!-- Logo -->
+            <a href="/listings" class="nav-logo">
+                <img src="/images/airbnb.png" alt="Airbnb Logo" />
+                <p>airbnb</p>
+            </a>
+
+            <!-- Search Bar -->
+            <div class="nav-search">
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        placeholder="Where are you going? (Enter country)"
+                        id="searchInput"
+                    />
+                    <button class="search-btn" type="button" onclick="performSearch()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Navigation -->
+            <div class="nav-right">
+                <a href="/listings" class="nav-link">Explore</a>
+                <a href="/listings/new" class="nav-link">Airbnb your home</a>
+                
+                <!-- Conditional rendering would be done server-side -->
+                <!-- If not logged in -->
+                  <%if(!currUser){ %>
+                <a href="/signup" class="nav-link secondary">Sign Up</a>
+                <a href="/login" class="nav-link primary">Login</a>
+                <% } %>
+                <!-- If logged in (replace above with this) -->
+                <%if(currUser){ %>   
+                <div class="user-menu" onclick="toggleUserMenu()">
+                    <i class="fas fa-bars"></i>
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                <a href="/logout" class="nav-link">Logout</a>
+               <% } %>
+            </div>
+
+            <!-- Hamburger for Mobile -->
+            <div class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="/listings">Explore</a>
+            <a href="/listings/new">Airbnb your home</a>
+            <!-- Conditional rendering for mobile -->
+            <%if(!currUser){ %>   
+
+            <a href="/signup">Sign Up</a>
+            <a href="/login">Login</a>
+            <% } %>
+<%if(currUser){ %>   
+            <a href="/logout">Logout</a>
+            <% } %>
+        </div>
+</nav>
+
+<script>
+   let inputBox = document.querySelector("#searchInput");
+
+function performSearch() {
+    let value = inputBox.value.trim();
+    if (!value) {
+        alert('Please enter a search term');
+        return;
+    }
+    window.location.href = `/listings?query=${encodeURIComponent(value)}`;
+}
+
+// Allow search on Enter key
+inputBox.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        performSearch();
+    }
+});
+</script>

@@ -1,0 +1,25 @@
+<% layout("layouts/biolerplate.ejs") %>
+<body>
+<div class="signUp-body">
+
+ <div class="signup-container">
+    <h2>Login to your Account</h2>
+
+    <form id="signupForm" action="/login" method="POST" novalidate onsubmit="return validateLoginform()">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required />
+        <div class="error-msg" id="usernameError"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required />
+    <div class="error-msg" id="passwordError"></div>
+      </div>
+
+      <button class="btn" type="submit">Login</button>
+    </form>
+  </div>
+  </div>
+</body>
