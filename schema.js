@@ -11,7 +11,7 @@ const listingSchema = Joi.object({
     price : Joi.number().required().min(0),
     location : Joi.string().required(),
     country :  Joi.string().required(),
-    category : Joi.array().required().min(1).max(3),
+    // category : Joi.array().required().min(1).max(3),
     }).required(),
     
 
